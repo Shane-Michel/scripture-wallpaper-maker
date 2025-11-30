@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scripture Wallpaper Maker - Bold Artistic (Pixabay)</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: "Segoe UI", sans-serif;
+  background: #111;
+  color: #eee;
+  text-align: center;
+}
+
+h1 {
+  color: #ffdd55;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px #000;
+}
+
+#controls {
+  margin-bottom: 20px;
+}
+
+input, select, button {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  margin: 6px;
+}
+
+button {
+  cursor: pointer;
+  background: #ffdd55;
+  color: #222;
+  font-weight: bold;
+}
+
+#wrapper {
+  margin-top: 20px;
+}
+
+canvas {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 0 20px #000;
+}
+</style>
+</head>
+<body>
+
+<h1>Scripture Wallpaper Maker</h1>
+
+<div id="controls">
+  <input type="text" id="reference" placeholder="Enter reference (e.g. John 3:16)" />
+
+  <select id="align">
+    <option value="center">Center</option>
+    <option value="left">Left</option>
+    <option value="right">Right</option>
+  </select>
+
+  <select id="fontSize">
+    <option value="42">Large (42px)</option>
+    <option value="32">Medium (32px)</option>
+    <option value="24">Small (24px)</option>
+  </select>
+
+  <button id="generateBtn">Generate Wallpaper</button>
+  <button id="downloadBtn">Download</button>
+</div>
+
+<div id="wrapper">
+  <canvas id="wallpaperCanvas" width="1080" height="1920"></canvas>
+</div>
+
+<script>
+const PIXABAY_KEY = "53480329-e7a753209abe9055845aed7e2";
+
+const canvas = document.getElementById("wallpaperCanvas");
+const ctx = canvas.getContext("2d");
+
+async function fetchVerse(reference) {
+  const res = await fetch(`https://bible-api.com/${encodeURIComponent(reference)}`);
+  if (!res.ok) throw new Error("Verse not found");
+  return res.json();
+}
+
+async function fetchBackground() {
+  const url = `https://pixabay.com/api/?key=${PIXABAY_KEY}&q=nature+landscape+light&image_type=photo&orientation=vertical&per_page=50`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  const hits = data.hits;
+  if (hits.length === 0) throw new Error("No images found.");
+
+  const random = hits[Math.floor(Math.random() * hits.length)];
+  return random.largeImageURL;
+}
+
+function wrapText(text, x, y, maxWidth, lineHeight) {
+  const words = text.split(" ");
+  let line = "";
+
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + " ";
+    const testWidth = ctx.measureText(testLine).width;
+
+    if (testWidth > maxWidth && n > 0) {
+      ctx.fillText(line, x, y);
+      line = words[n] + " ";
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+
+  ctx.fillText(line, x, y);
+}
+
+async function generateWallpaper() {
+  const reference = document.getElementById("reference").value.trim();
+  if (!reference) return alert("Enter a verse reference.");
+
+  let verseData;
+  try {
+    verseData = await fetchVerse(reference);
+  } catch (err) {
+    alert("Verse not found.");
+    return;
+  }
+
+  const text = verseData.text.trim();
+  const verseRef = `${verseData.reference}`;
+
+  const bgUrl = await fetchBackground();
+  const bgImg = new Image();
+  bgImg.crossOrigin = "anonymous";
+
+  bgImg.onload = () => {
+    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Text styling
+    const fontSize = parseInt(document.getElementById("fontSize").value);
+    ctx.font = `bold ${fontSize}px 'Segoe UI', sans-serif`;
+    ctx.fillStyle = "#ffdd55";
+    ctx.textBaseline = "top";
+    ctx.shadowColor = "#000";
+    ctx.shadowBlur = 8;
+
+    const align = document.getElementById("align").value;
+    ctx.textAlign = align;
+
+    const margin = 80;
+    let x;
+    if (align === "center") x = canvas.width / 2;
+    if (align === "left") x = margin;
+    if (align === "right") x = canvas.width - margin;
+
+    let y = 200;
+
+    wrapText(text, x, y, canvas.width - margin * 2, fontSize * 1.4);
+
+    ctx.font = `bold 36px 'Segoe UI'`;
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowBlur = 12;
+    ctx.textAlign = "center";
+    ctx.fillText(verseRef, canvas.width / 2, canvas.height - 150);
+  };
+
+  bgImg.src = bgUrl;
+}
+
+document.getElementById("generateBtn").onclick = generateWallpaper;
+
+document.getElementById("downloadBtn").onclick = () => {
+  const link = document.createElement("a");
+  link.download = "scripture-wallpaper.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+};
+</script>
+
+</body>
+</html>
