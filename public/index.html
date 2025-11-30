@@ -3,86 +3,365 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Scripture Wallpaper Maker - Keyword + Reference</title>
-
+<title>Scripture Wallpaper Studio</title>
 <style>
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --panel-2: #11151c;
+  --stroke: #1f2733;
+  --accent: #ffdd55;
+  --text: #e5e9f0;
+  --muted: #9aa0aa;
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+}
+
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
-  padding: 20px;
-  font-family: "Segoe UI", sans-serif;
-  background: #111;
-  color: #eee;
-  text-align: center;
+  padding: 26px;
+  font-family: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
+  background: radial-gradient(circle at 20% 20%, rgba(255, 221, 85, 0.12), transparent 35%),
+              radial-gradient(circle at 80% 10%, rgba(93, 152, 255, 0.12), transparent 30%),
+              var(--bg);
+  color: var(--text);
 }
 
 h1 {
-  color: #ffdd55;
-  font-weight: 600;
-  margin-bottom: 10px;
-  text-shadow: 0 0 10px #000;
+  margin: 0 0 6px;
+  font-size: 26px;
+  letter-spacing: 0.4px;
+  color: var(--accent);
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
-#controls {
-  margin-bottom: 20px;
+p.lede {
+  margin: 0 0 14px;
+  color: var(--muted);
 }
 
-input, select, button {
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: none;
-  margin: 6px;
+.layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 420px) 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)) var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  padding: 16px 16px 18px;
+  box-shadow: var(--shadow);
+}
+
+.panel h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+input[type="text"],
+textarea,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--stroke);
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 15px;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+input[type="color"] {
+  width: 100%;
+  padding: 6px;
+  height: 42px;
+}
+
+input[type="range"] {
+  width: 100%;
 }
 
 button {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--stroke);
+  background: linear-gradient(135deg, var(--accent), #ffd43b);
+  color: #1b1506;
+  font-weight: 700;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  background: #ffdd55;
-  color: #222;
-  font-weight: bold;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 12px 30px rgba(255, 221, 85, 0.25);
+}
+
+button.secondary {
+  background: var(--panel-2);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--stroke);
+}
+
+button:hover { transform: translateY(-1px); }
+button:active { transform: translateY(0); }
+
+.stack { display: flex; gap: 8px; margin-top: 6px; }
+.stack button { flex: 1; }
+
+.layer-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.layer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--stroke);
+  background: var(--panel-2);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.layer-item.active {
+  border-color: var(--accent);
+  background: rgba(255, 221, 85, 0.08);
+  color: var(--accent);
+}
+
+.layer-item small { color: var(--muted); }
+
+.muted { color: var(--muted); }
+
+.canvas-wrap {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)) var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+
+.canvas-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.chip {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--stroke);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.canvas-frame {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0b0f15;
 }
 
 canvas {
-  max-width: 100%;
+  width: 100%;
+  height: auto;
   border-radius: 12px;
-  box-shadow: 0 0 20px #000;
+  display: block;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 8px 0 0;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.row > div { flex: 1; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--stroke);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.section {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--stroke);
+}
+
+.small-btn {
+  width: auto;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+@media (max-width: 960px) {
+  body { padding: 14px; }
+  .layout { grid-template-columns: 1fr; }
+  .canvas-bar { flex-direction: column; align-items: flex-start; }
 }
 </style>
 </head>
 <body>
+  <div class="layout">
+    <div>
+      <h1>Scripture Wallpaper Studio</h1>
+      <p class="lede">Drag text, resize, add subtitles or logos, and manage layers like Photoshop.</p>
 
-<h1>Scripture Wallpaper Maker</h1>
-<p>Enter a verse (ex: John 3:16) <br> OR a keyword (ex: hope, peace, love)</p>
+      <div class="panel">
+        <h3>Verse & Generator</h3>
+        <label for="reference">Verse or Keyword</label>
+        <input type="text" id="reference" placeholder="John 3:16 or 'hope'" />
 
-<div id="controls">
-  <input type="text" id="reference" placeholder="Enter Verse or Keyword" />
+        <div class="controls-grid" style="margin-top:10px;">
+          <div>
+            <label for="align">Align</label>
+            <select id="align">
+              <option value="center">Center</option>
+              <option value="left">Left</option>
+              <option value="right">Right</option>
+            </select>
+          </div>
+          <div>
+            <label for="fontSize">Base Font Size</label>
+            <select id="fontSize">
+              <option value="46">Large</option>
+              <option value="36">Medium</option>
+              <option value="28">Small</option>
+            </select>
+          </div>
+        </div>
 
-  <select id="align">
-    <option value="center">Center</option>
-    <option value="left">Left</option>
-    <option value="right">Right</option>
-  </select>
+        <div class="stack" style="margin-top:12px;">
+          <button id="generateBtn">Generate Wallpaper</button>
+          <button class="secondary" id="backgroundBtn">Shuffle Background</button>
+        </div>
+        <div class="stack">
+          <button class="secondary" id="addTextBtn">Add Text Block</button>
+          <button class="secondary" id="addSubtitleBtn">Add Subtitle</button>
+        </div>
+        <div class="stack">
+          <button class="secondary" id="addLogoBtn">Add Logo</button>
+          <input type="file" id="logoInput" accept="image/*" style="display:none;" />
+          <button id="downloadBtn">Download</button>
+        </div>
+        <p class="hint">Tip: Drag to move layers. Grab the corner handle to resize.</p>
+      </div>
 
-  <select id="fontSize">
-    <option value="42">Large (42px)</option>
-    <option value="32">Medium (32px)</option>
-    <option value="24">Small (24px)</option>
-  </select>
+      <div class="panel">
+        <h3>Layer Stack</h3>
+        <div id="layerList" class="layer-list"></div>
+        <div class="hint">Click a layer to edit content, color, size, or alignment.</div>
 
-  <button id="generateBtn">Generate Wallpaper</button>
-  <button id="downloadBtn">Download</button>
-</div>
+        <div class="section" id="inspector">
+          <h3>Inspector</h3>
+          <div id="layerInspector" class="muted">Select a layer to edit its properties.</div>
+        </div>
 
-<canvas id="wallpaperCanvas" width="1080" height="1920"></canvas>
+        <div class="section">
+          <h3>Overlays & Frame</h3>
+          <div class="controls-grid">
+            <div>
+              <label for="overlayColor">Overlay Color</label>
+              <input type="color" id="overlayColor" value="#000000" />
+            </div>
+            <div>
+              <label for="overlayOpacity">Overlay Strength</label>
+              <input type="range" id="overlayOpacity" min="0" max="0.9" step="0.05" value="0.45" />
+            </div>
+            <div>
+              <label for="borderColor">Border Color</label>
+              <input type="color" id="borderColor" value="#ffdd55" />
+            </div>
+            <div>
+              <label for="borderWidth">Border Width</label>
+              <input type="range" id="borderWidth" min="0" max="24" step="1" value="14" />
+            </div>
+          </div>
+          <div class="row">
+            <label class="pill"><input type="checkbox" id="overlayToggle" checked /> Overlay</label>
+            <label class="pill"><input type="checkbox" id="borderToggle" checked /> Border</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="canvas-wrap">
+      <div class="canvas-bar">
+        <span class="chip">Canvas: 1080 x 1920 (Vertical)</span>
+        <span class="chip">Drag text • Resize via corner • Layers: background, text, overlays, borders, logos</span>
+      </div>
+      <div class="canvas-frame">
+        <canvas id="wallpaperCanvas" width="1080" height="1920"></canvas>
+      </div>
+    </div>
+  </div>
 
 <script>
 const PIXABAY_KEY = "53480329-e7a753209abe9055845aed7e2";
 const canvas = document.getElementById("wallpaperCanvas");
 const ctx = canvas.getContext("2d");
 
-/* -------------------------------
+const state = {
+  layers: [],
+  overlay: { enabled: true, color: "#000000", opacity: 0.45 },
+  border: { enabled: true, color: "#ffdd55", width: 14, inset: 18 },
+  background: { img: null, url: null },
+};
+
+let activeLayerId = null;
+let dragState = null;
+
+/* -------------------------------------
    KEYWORD → VERSE MAPPING
    (Public domain references, fully safe to use)
---------------------------------*/
+-------------------------------------*/
 const keywordMap = {
   hope: [
     "Jeremiah 29:11",
@@ -187,6 +466,79 @@ const keywordMap = {
   ]
 };
 
+function uid() {
+  return (crypto.randomUUID && crypto.randomUUID()) || `id-${Math.random().toString(16).slice(2)}-${Date.now()}`;
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function hexToRgba(hex, alpha = 1) {
+  const clean = hex.replace("#", "");
+  const num = parseInt(clean, 16);
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function wrapLines(text, maxWidth, font) {
+  ctx.save();
+  ctx.font = font;
+  const words = text.split(/\s+/);
+  const lines = [];
+  let line = "";
+
+  for (let i = 0; i < words.length; i++) {
+    const test = line ? line + " " + words[i] : words[i];
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = words[i];
+    } else {
+      line = test;
+    }
+  }
+  if (line) lines.push(line);
+  ctx.restore();
+  return lines;
+}
+
+function createTextLayer({ text, name, fontSize, align, color, x, y, width, type }) {
+  return {
+    id: uid(),
+    type: type || "text",
+    name: name || "Text",
+    text: text || "New text",
+    fontSize: fontSize || 38,
+    fontFamily: "Segoe UI",
+    fontWeight: "700",
+    color: color || "#ffdd55",
+    align: align || "center",
+    boxWidth: width || canvas.width - 200,
+    x: x || 80,
+    y: y || 260,
+    opacity: 1
+  };
+}
+
+function createLogoLayer(img) {
+  const baseWidth = 220;
+  const ratio = img.height ? img.width / img.height : 1;
+  return {
+    id: uid(),
+    type: "logo",
+    name: "Logo",
+    image: img,
+    width: baseWidth,
+    height: baseWidth / ratio,
+    ratio,
+    x: canvas.width - baseWidth - 60,
+    y: canvas.height - baseWidth / ratio - 80,
+    opacity: 0.9
+  };
+}
+
 async function fetchVerse(reference) {
   const res = await fetch(`https://bible-api.com/${encodeURIComponent(reference)}`);
   if (!res.ok) throw new Error("Verse not found");
@@ -197,52 +549,239 @@ async function fetchBackground() {
   const url = `https://pixabay.com/api/?key=${PIXABAY_KEY}&q=nature+landscape+light&image_type=photo&orientation=vertical&per_page=50`;
   const res = await fetch(url);
   const data = await res.json();
-  const hits = data.hits;
-  if (hits.length === 0) throw new Error("No images found.");
+  const hits = data.hits || [];
+  if (!hits.length) throw new Error("No images found");
   return hits[Math.floor(Math.random() * hits.length)].largeImageURL;
 }
 
-function wrapText(text, x, y, maxWidth, lineHeight) {
-  const words = text.split(" ");
-  let line = "";
-  for (let n = 0; n < words.length; n++) {
-    const testLine = line + words[n] + " ";
-    const testWidth = ctx.measureText(testLine).width;
-    if (testWidth > maxWidth && n > 0) {
-      ctx.fillText(line, x, y);
-      line = words[n] + " ";
-      y += lineHeight;
-    } else {
-      line = testLine;
-    }
-  }
-  ctx.fillText(line, x, y);
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+  });
 }
 
 async function getReferenceFromKeyword(keyword) {
   keyword = keyword.toLowerCase();
   if (!keywordMap[keyword]) return null;
-
   const arr = keywordMap[keyword];
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+function drawBackground() {
+  if (state.background.img) {
+    const img = state.background.img;
+    const ratio = Math.max(canvas.width / img.width, canvas.height / img.height);
+    const w = img.width * ratio;
+    const h = img.height * ratio;
+    const x = (canvas.width - w) / 2;
+    const y = (canvas.height - h) / 2;
+    ctx.drawImage(img, x, y, w, h);
+  } else {
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    grad.addColorStop(0, "#1b2635");
+    grad.addColorStop(1, "#0e141c");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+function drawOverlay() {
+  if (!state.overlay.enabled) return;
+  ctx.fillStyle = hexToRgba(state.overlay.color, state.overlay.opacity);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function measureTextLayer(layer) {
+  const font = `${layer.fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+  const lines = wrapLines(layer.text || " ", layer.boxWidth, font);
+  const lineHeight = Math.round(layer.fontSize * 1.35);
+  return { lines, lineHeight, height: Math.max(lineHeight, lines.length * lineHeight) };
+}
+
+function drawTextLayer(layer) {
+  ctx.save();
+  ctx.globalAlpha = layer.opacity ?? 1;
+  ctx.fillStyle = layer.color;
+  ctx.shadowColor = "rgba(0,0,0,0.75)";
+  ctx.shadowBlur = 10;
+  const font = `${layer.fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+  const { lines, lineHeight, height } = measureTextLayer(layer);
+  ctx.font = font;
+  ctx.textAlign = layer.align;
+  ctx.textBaseline = "top";
+
+  const anchorX = layer.align === "center"
+    ? layer.x + layer.boxWidth / 2
+    : layer.align === "right"
+    ? layer.x + layer.boxWidth
+    : layer.x;
+
+  lines.forEach((line, i) => ctx.fillText(line, anchorX, layer.y + i * lineHeight));
+
+  ctx.restore();
+  layer.bounds = { x: layer.x, y: layer.y, width: layer.boxWidth, height };
+}
+
+function drawLogoLayer(layer) {
+  if (!layer.image) return;
+  ctx.save();
+  ctx.globalAlpha = layer.opacity ?? 1;
+  ctx.drawImage(layer.image, layer.x, layer.y, layer.width, layer.height);
+  ctx.restore();
+  layer.bounds = { x: layer.x, y: layer.y, width: layer.width, height: layer.height };
+}
+
+function drawBorder() {
+  if (!state.border.enabled || state.border.width <= 0) return;
+  ctx.save();
+  ctx.strokeStyle = state.border.color;
+  ctx.lineWidth = state.border.width;
+  const offset = state.border.inset;
+  ctx.strokeRect(
+    offset,
+    offset,
+    canvas.width - offset * 2,
+    canvas.height - offset * 2
+  );
+  ctx.restore();
+}
+
+function drawSelection(layer) {
+  if (!layer?.bounds) return;
+  const { x, y, width, height } = layer.bounds;
+  ctx.save();
+  ctx.strokeStyle = "#7cd0ff";
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 6]);
+  ctx.strokeRect(x, y, width, height);
+  ctx.setLineDash([]);
+  const size = 12;
+  ctx.fillStyle = "#7cd0ff";
+  ctx.strokeStyle = "#0d1117";
+  ctx.lineWidth = 1.5;
+  ctx.fillRect(x + width - size / 2, y + height - size / 2, size, size);
+  ctx.strokeRect(x + width - size / 2, y + height - size / 2, size, size);
+  ctx.restore();
+}
+
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBackground();
+  drawOverlay();
+
+  state.layers.forEach(layer => {
+    if (layer.type === "logo") {
+      drawLogoLayer(layer);
+    } else {
+      drawTextLayer(layer);
+    }
+  });
+
+  drawBorder();
+  const active = state.layers.find(l => l.id === activeLayerId);
+  drawSelection(active);
+}
+
+function hitTestHandles(bounds, x, y) {
+  if (!bounds) return null;
+  const handleX = bounds.x + bounds.width;
+  const handleY = bounds.y + bounds.height;
+  const distance = Math.hypot(x - handleX, y - handleY);
+  if (distance < 16) return "se";
+  return null;
+}
+
+function pickLayer(x, y) {
+  for (let i = state.layers.length - 1; i >= 0; i--) {
+    const layer = state.layers[i];
+    const b = layer.bounds;
+    if (!b) continue;
+    if (x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height) {
+      const handle = hitTestHandles(b, x, y);
+      return { layer, handle };
+    }
+  }
+  return null;
+}
+
+function canvasPoint(evt) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return {
+    x: (evt.clientX - rect.left) * scaleX,
+    y: (evt.clientY - rect.top) * scaleY,
+  };
+}
+
+function startDrag(evt) {
+  const { x, y } = canvasPoint(evt);
+  const hit = pickLayer(x, y);
+  if (!hit) return;
+
+  activeLayerId = hit.layer.id;
+  updateLayerList();
+  renderInspector();
+
+  dragState = {
+    mode: hit.handle ? "resize" : "move",
+    startX: x,
+    startY: y,
+    layerStart: { ...hit.layer }
+  };
+  canvas.setPointerCapture(evt.pointerId);
+}
+
+function onDrag(evt) {
+  if (!dragState) return;
+  const { x, y } = canvasPoint(evt);
+  const dx = x - dragState.startX;
+  const dy = y - dragState.startY;
+  const layer = state.layers.find(l => l.id === activeLayerId);
+  if (!layer) return;
+
+  if (dragState.mode === "move") {
+    layer.x = clamp(dragState.layerStart.x + dx, 10, canvas.width - 40);
+    layer.y = clamp(dragState.layerStart.y + dy, 10, canvas.height - 40);
+  } else if (dragState.mode === "resize") {
+    if (layer.type === "logo") {
+      const newWidth = clamp(dragState.layerStart.width + dx, 60, canvas.width - layer.x - 10);
+      layer.width = newWidth;
+      layer.height = newWidth / layer.ratio;
+    } else {
+      const scale = clamp((dragState.layerStart.boxWidth + dx) / dragState.layerStart.boxWidth, 0.35, 3);
+      layer.boxWidth = clamp(dragState.layerStart.boxWidth * scale, 120, canvas.width - 80);
+      layer.fontSize = clamp(Math.round(dragState.layerStart.fontSize * scale), 14, 110);
+    }
+  }
+  render();
+  renderInspector();
+}
+
+function endDrag(evt) {
+  if (dragState) {
+    canvas.releasePointerCapture(evt.pointerId);
+  }
+  dragState = null;
+}
+
 async function generateWallpaper() {
-  let input = document.getElementById("reference").value.trim();
+  const input = document.getElementById("reference").value.trim();
+  const align = document.getElementById("align").value;
+  const baseFont = parseInt(document.getElementById("fontSize").value, 10);
   if (!input) return alert("Enter a verse or keyword.");
 
   let reference = input;
-  
-  /* --------------------------
-     Detect Keyword (Single Word)
-  ---------------------------*/
   if (!input.includes(":") && input.split(" ").length === 1) {
     const match = await getReferenceFromKeyword(input);
     if (!match) return alert("No verses found for this keyword.");
     reference = match;
   }
 
-  // Fetch verse text
   let verseData;
   try {
     verseData = await fetchVerse(reference);
@@ -250,54 +789,251 @@ async function generateWallpaper() {
     return alert("Verse not found.");
   }
 
-  const text = verseData.text.trim();
-  const verseRef = verseData.reference;
+  let bgUrl;
+  try {
+    bgUrl = await fetchBackground();
+    state.background.img = await loadImage(bgUrl);
+    state.background.url = bgUrl;
+  } catch (err) {
+    console.warn("Background fetch failed", err);
+  }
 
-  const bgUrl = await fetchBackground();
-  const bgImg = new Image();
-  bgImg.crossOrigin = "anonymous";
+  const verseText = (verseData.text || "").trim();
+  const verseRef = verseData.reference || reference;
 
-  bgImg.onload = () => {
-    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+  // Reset layers and add verse + reference
+  state.layers = [];
+  const mainText = createTextLayer({
+    name: "Verse",
+    text: verseText,
+    fontSize: baseFont,
+    align,
+    x: 90,
+    y: 320,
+    width: canvas.width - 180
+  });
+  const refText = createTextLayer({
+    name: "Reference",
+    text: verseRef,
+    fontSize: 28,
+    align: "center",
+    color: "#ffffff",
+    x: canvas.width / 2 - 200,
+    y: canvas.height - 200,
+    width: 400
+  });
 
-    ctx.fillStyle = "rgba(0,0,0,0.45)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const fontSize = parseInt(document.getElementById("fontSize").value);
-    ctx.font = `bold ${fontSize}px Segoe UI`;
-    ctx.fillStyle = "#ffdd55";
-    ctx.textBaseline = "top";
-    ctx.shadowColor = "#000";
-    ctx.shadowBlur = 8;
-
-    const align = document.getElementById("align").value;
-    ctx.textAlign = align;
-
-    const margin = 80;
-    let x = align === "center" ? canvas.width / 2 :
-            align === "left" ? margin : canvas.width - margin;
-
-    wrapText(text, x, 200, canvas.width - margin * 2, fontSize * 1.4);
-
-    ctx.font = "bold 36px Segoe UI";
-    ctx.fillStyle = "#fff";
-    ctx.shadowBlur = 12;
-    ctx.textAlign = "center";
-    ctx.fillText(verseRef, canvas.width / 2, canvas.height - 150);
-  };
-
-  bgImg.src = bgUrl;
+  state.layers.push(mainText, refText);
+  activeLayerId = mainText.id;
+  updateLayerList();
+  renderInspector();
+  render();
 }
 
-document.getElementById("generateBtn").onclick = generateWallpaper;
+function addTextBlock() {
+  const layer = createTextLayer({
+    name: "Text Block",
+    text: "New text block",
+    fontSize: 34,
+    align: "left",
+    x: 80,
+    y: 180,
+    width: canvas.width - 160
+  });
+  state.layers.push(layer);
+  activeLayerId = layer.id;
+  updateLayerList();
+  renderInspector();
+  render();
+}
 
-document.getElementById("downloadBtn").onclick = () => {
+function addSubtitle() {
+  const layer = createTextLayer({
+    name: "Subtitle",
+    text: "Reflection or prayer...",
+    fontSize: 22,
+    align: "left",
+    color: "#e2e8f0",
+    x: 80,
+    y: canvas.height - 300,
+    width: canvas.width - 160,
+    type: "subtitle"
+  });
+  layer.fontWeight = "600";
+  state.layers.push(layer);
+  activeLayerId = layer.id;
+  updateLayerList();
+  renderInspector();
+  render();
+}
+
+function handleLogoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = evt => {
+    const img = new Image();
+    img.onload = () => {
+      const layer = createLogoLayer(img);
+      state.layers.push(layer);
+      activeLayerId = layer.id;
+      updateLayerList();
+      renderInspector();
+      render();
+    };
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateLayerList() {
+  const list = document.getElementById("layerList");
+  if (!state.layers.length) {
+    list.innerHTML = '<div class="muted">No layers yet. Generate a verse or add text.</div>';
+    return;
+  }
+  list.innerHTML = "";
+  const labels = { text: "Text", subtitle: "Subtitle", logo: "Logo" };
+
+  state.layers.forEach(layer => {
+    const btn = document.createElement("div");
+    btn.className = "layer-item" + (layer.id === activeLayerId ? " active" : "");
+    btn.innerHTML = `<div>${layer.name}</div><small>${labels[layer.type] || "Layer"}</small>`;
+    btn.onclick = () => {
+      activeLayerId = layer.id;
+      renderInspector();
+      render();
+      updateLayerList();
+    };
+    list.appendChild(btn);
+  });
+}
+
+function renderInspector() {
+  const inspector = document.getElementById("layerInspector");
+  const layer = state.layers.find(l => l.id === activeLayerId);
+  if (!layer) {
+    inspector.innerHTML = '<div class="muted">Select a layer to edit its properties.</div>';
+    return;
+  }
+
+  if (layer.type === "logo") {
+    inspector.innerHTML = `
+      <label>Opacity <input type="range" id="logoOpacity" min="0.1" max="1" step="0.05" value="${layer.opacity}" /></label>
+      <button class="secondary small-btn" id="deleteLayer">Delete Logo</button>
+    `;
+    document.getElementById("logoOpacity").oninput = e => {
+      layer.opacity = parseFloat(e.target.value);
+      render();
+    };
+  } else {
+    inspector.innerHTML = `
+      <label>Text</label>
+      <textarea id="layerText">${layer.text}</textarea>
+      <label>Font Size <input type="range" id="layerFontSize" min="14" max="110" step="1" value="${layer.fontSize}" /></label>
+      <label>Box Width <input type="range" id="layerWidth" min="140" max="${canvas.width - 60}" step="10" value="${layer.boxWidth}" /></label>
+      <div class="row">
+        <div><label>Color</label><input type="color" id="layerColor" value="${layer.color}"></div>
+        <div>
+          <label>Align</label>
+          <select id="layerAlign">
+            <option value="left" ${layer.align === "left" ? "selected" : ""}>Left</option>
+            <option value="center" ${layer.align === "center" ? "selected" : ""}>Center</option>
+            <option value="right" ${layer.align === "right" ? "selected" : ""}>Right</option>
+          </select>
+        </div>
+      </div>
+      <label>Opacity <input type="range" id="layerOpacity" min="0.2" max="1" step="0.05" value="${layer.opacity}" /></label>
+      <div class="stack">
+        <button class="secondary" id="deleteLayer">Delete</button>
+      </div>
+    `;
+
+    document.getElementById("layerText").oninput = e => {
+      layer.text = e.target.value;
+      render();
+    };
+    document.getElementById("layerFontSize").oninput = e => {
+      layer.fontSize = parseInt(e.target.value, 10);
+      render();
+    };
+    document.getElementById("layerWidth").oninput = e => {
+      layer.boxWidth = parseInt(e.target.value, 10);
+      render();
+    };
+    document.getElementById("layerColor").oninput = e => {
+      layer.color = e.target.value;
+      render();
+    };
+    document.getElementById("layerAlign").onchange = e => {
+      layer.align = e.target.value;
+      render();
+    };
+    document.getElementById("layerOpacity").oninput = e => {
+      layer.opacity = parseFloat(e.target.value);
+      render();
+    };
+  }
+
+  const deleteBtn = document.getElementById("deleteLayer");
+  if (deleteBtn) {
+    deleteBtn.onclick = () => {
+      state.layers = state.layers.filter(l => l.id !== layer.id);
+      activeLayerId = state.layers[state.layers.length - 1]?.id || null;
+      updateLayerList();
+      renderInspector();
+      render();
+    };
+  }
+}
+
+function applyOverlaySettings() {
+  state.overlay.enabled = document.getElementById("overlayToggle").checked;
+  state.overlay.color = document.getElementById("overlayColor").value;
+  state.overlay.opacity = parseFloat(document.getElementById("overlayOpacity").value);
+  state.border.enabled = document.getElementById("borderToggle").checked;
+  state.border.color = document.getElementById("borderColor").value;
+  state.border.width = parseInt(document.getElementById("borderWidth").value, 10);
+  render();
+}
+
+function downloadImage() {
   const link = document.createElement("a");
   link.download = "scripture-wallpaper.png";
   link.href = canvas.toDataURL("image/png");
   link.click();
-};
-</script>
+}
 
+document.getElementById("generateBtn").onclick = generateWallpaper;
+document.getElementById("backgroundBtn").onclick = async () => {
+  try {
+    const bgUrl = await fetchBackground();
+    state.background.img = await loadImage(bgUrl);
+    state.background.url = bgUrl;
+    render();
+  } catch (err) {
+    alert("Could not load a new background right now.");
+  }
+};
+document.getElementById("downloadBtn").onclick = downloadImage;
+document.getElementById("addTextBtn").onclick = addTextBlock;
+document.getElementById("addSubtitleBtn").onclick = addSubtitle;
+document.getElementById("addLogoBtn").onclick = () => document.getElementById("logoInput").click();
+document.getElementById("logoInput").onchange = handleLogoUpload;
+
+["overlayColor", "overlayOpacity", "borderColor", "borderWidth", "overlayToggle", "borderToggle"].forEach(id => {
+  document.getElementById(id).addEventListener("input", applyOverlaySettings);
+  document.getElementById(id).addEventListener("change", applyOverlaySettings);
+});
+
+canvas.addEventListener("pointerdown", startDrag);
+canvas.addEventListener("pointermove", onDrag);
+canvas.addEventListener("pointerup", endDrag);
+canvas.addEventListener("pointerleave", endDrag);
+
+// Initial render
+updateLayerList();
+render();
+</script>
 </body>
 </html>
