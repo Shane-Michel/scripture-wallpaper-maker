@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Scripture Wallpaper Maker - Bold Artistic (Pixabay)</title>
+<title>Scripture Wallpaper Maker - Keyword + Reference</title>
 
 <style>
 body {
@@ -41,10 +41,6 @@ button {
   font-weight: bold;
 }
 
-#wrapper {
-  margin-top: 20px;
-}
-
 canvas {
   max-width: 100%;
   border-radius: 12px;
@@ -55,9 +51,10 @@ canvas {
 <body>
 
 <h1>Scripture Wallpaper Maker</h1>
+<p>Enter a verse (ex: John 3:16) <br> OR a keyword (ex: hope, peace, love)</p>
 
 <div id="controls">
-  <input type="text" id="reference" placeholder="Enter reference (e.g. John 3:16)" />
+  <input type="text" id="reference" placeholder="Enter Verse or Keyword" />
 
   <select id="align">
     <option value="center">Center</option>
@@ -75,15 +72,54 @@ canvas {
   <button id="downloadBtn">Download</button>
 </div>
 
-<div id="wrapper">
-  <canvas id="wallpaperCanvas" width="1080" height="1920"></canvas>
-</div>
+<canvas id="wallpaperCanvas" width="1080" height="1920"></canvas>
 
 <script>
 const PIXABAY_KEY = "53480329-e7a753209abe9055845aed7e2";
-
 const canvas = document.getElementById("wallpaperCanvas");
 const ctx = canvas.getContext("2d");
+
+/* -------------------------------
+   KEYWORD → VERSE MAPPING
+   (Public domain references, fully safe to use)
+--------------------------------*/
+const keywordMap = {
+  hope: [
+    "Jeremiah 29:11",
+    "Romans 15:13",
+    "Psalm 42:11",
+    "Hebrews 11:1",
+    "1 Peter 1:3"
+  ],
+  peace: [
+    "John 14:27",
+    "Philippians 4:7",
+    "Isaiah 26:3",
+    "Colossians 3:15"
+  ],
+  love: [
+    "1 Corinthians 13:4-7",
+    "John 3:16",
+    "1 John 4:19",
+    "Romans 5:8"
+  ],
+  strength: [
+    "Philippians 4:13",
+    "Isaiah 40:31",
+    "Psalm 46:1",
+    "Deuteronomy 31:6"
+  ],
+  faith: [
+    "Hebrews 11:1",
+    "2 Corinthians 5:7",
+    "Mark 11:22"
+  ],
+  joy: [
+    "Nehemiah 8:10",
+    "Romans 15:13",
+    "Psalm 16:11"
+  ]
+};
 
 async function fetchVerse(reference) {
   const res = await fetch(`https://bible-api.com/${encodeURIComponent(reference)}`);
@@ -95,22 +131,17 @@ async function fetchBackground() {
   const url = `https://pixabay.com/api/?key=${PIXABAY_KEY}&q=nature+landscape+light&image_type=photo&orientation=vertical&per_page=50`;
   const res = await fetch(url);
   const data = await res.json();
-
   const hits = data.hits;
   if (hits.length === 0) throw new Error("No images found.");
-
-  const random = hits[Math.floor(Math.random() * hits.length)];
-  return random.largeImageURL;
+  return hits[Math.floor(Math.random() * hits.length)].largeImageURL;
 }
 
 function wrapText(text, x, y, maxWidth, lineHeight) {
   const words = text.split(" ");
   let line = "";
-
   for (let n = 0; n < words.length; n++) {
     const testLine = line + words[n] + " ";
     const testWidth = ctx.measureText(testLine).width;
-
     if (testWidth > maxWidth && n > 0) {
       ctx.fillText(line, x, y);
       line = words[n] + " ";
@@ -119,24 +150,42 @@ function wrapText(text, x, y, maxWidth, lineHeight) {
       line = testLine;
     }
   }
-
   ctx.fillText(line, x, y);
 }
 
-async function generateWallpaper() {
-  const reference = document.getElementById("reference").value.trim();
-  if (!reference) return alert("Enter a verse reference.");
+async function getReferenceFromKeyword(keyword) {
+  keyword = keyword.toLowerCase();
+  if (!keywordMap[keyword]) return null;
 
+  const arr = keywordMap[keyword];
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+async function generateWallpaper() {
+  let input = document.getElementById("reference").value.trim();
+  if (!input) return alert("Enter a verse or keyword.");
+
+  let reference = input;
+  
+  /* --------------------------
+     Detect Keyword (Single Word)
+  ---------------------------*/
+  if (!input.includes(":") && input.split(" ").length === 1) {
+    const match = await getReferenceFromKeyword(input);
+    if (!match) return alert("No verses found for this keyword.");
+    reference = match;
+  }
+
+  // Fetch verse text
   let verseData;
   try {
     verseData = await fetchVerse(reference);
   } catch (err) {
-    alert("Verse not found.");
-    return;
+    return alert("Verse not found.");
   }
 
   const text = verseData.text.trim();
-  const verseRef = `${verseData.reference}`;
+  const verseRef = verseData.reference;
 
   const bgUrl = await fetchBackground();
   const bgImg = new Image();
@@ -148,9 +197,8 @@ async function generateWallpaper() {
     ctx.fillStyle = "rgba(0,0,0,0.45)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Text styling
     const fontSize = parseInt(document.getElementById("fontSize").value);
-    ctx.font = `bold ${fontSize}px 'Segoe UI', sans-serif`;
+    ctx.font = `bold ${fontSize}px Segoe UI`;
     ctx.fillStyle = "#ffdd55";
     ctx.textBaseline = "top";
     ctx.shadowColor = "#000";
@@ -160,17 +208,13 @@ async function generateWallpaper() {
     ctx.textAlign = align;
 
     const margin = 80;
-    let x;
-    if (align === "center") x = canvas.width / 2;
-    if (align === "left") x = margin;
-    if (align === "right") x = canvas.width - margin;
+    let x = align === "center" ? canvas.width / 2 :
+            align === "left" ? margin : canvas.width - margin;
 
-    let y = 200;
+    wrapText(text, x, 200, canvas.width - margin * 2, fontSize * 1.4);
 
-    wrapText(text, x, y, canvas.width - margin * 2, fontSize * 1.4);
-
-    ctx.font = `bold 36px 'Segoe UI'`;
-    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 36px Segoe UI";
+    ctx.fillStyle = "#fff";
     ctx.shadowBlur = 12;
     ctx.textAlign = "center";
     ctx.fillText(verseRef, canvas.width / 2, canvas.height - 150);
