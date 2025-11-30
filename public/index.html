@@ -4,249 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Scripture Wallpaper Studio</title>
-<style>
-:root {
-  --bg: #0d1117;
-  --panel: #161b22;
-  --panel-2: #11151c;
-  --stroke: #1f2733;
-  --accent: #ffdd55;
-  --text: #e5e9f0;
-  --muted: #9aa0aa;
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  padding: 26px;
-  font-family: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif;
-  background: radial-gradient(circle at 20% 20%, rgba(255, 221, 85, 0.12), transparent 35%),
-              radial-gradient(circle at 80% 10%, rgba(93, 152, 255, 0.12), transparent 30%),
-              var(--bg);
-  color: var(--text);
-}
-
-h1 {
-  margin: 0 0 6px;
-  font-size: 26px;
-  letter-spacing: 0.4px;
-  color: var(--accent);
-  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-}
-
-p.lede {
-  margin: 0 0 14px;
-  color: var(--muted);
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: minmax(360px, 420px) 1fr;
-  gap: 22px;
-  align-items: start;
-}
-
-.panel {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)) var(--panel);
-  border: 1px solid var(--stroke);
-  border-radius: 14px;
-  padding: 16px 16px 18px;
-  box-shadow: var(--shadow);
-}
-
-.panel h3 {
-  margin: 0 0 10px;
-  font-size: 14px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
-}
-
-label {
-  display: block;
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
-
-input[type="text"],
-textarea,
-select {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--stroke);
-  background: var(--panel-2);
-  color: var(--text);
-  font-size: 15px;
-}
-
-textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-input[type="color"] {
-  width: 100%;
-  padding: 6px;
-  height: 42px;
-}
-
-input[type="range"] {
-  width: 100%;
-}
-
-button {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--stroke);
-  background: linear-gradient(135deg, var(--accent), #ffd43b);
-  color: #1b1506;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-  box-shadow: 0 12px 30px rgba(255, 221, 85, 0.25);
-}
-
-button.secondary {
-  background: var(--panel-2);
-  color: var(--text);
-  box-shadow: inset 0 0 0 1px var(--stroke);
-}
-
-button:hover { transform: translateY(-1px); }
-button:active { transform: translateY(0); }
-
-.stack { display: flex; gap: 8px; margin-top: 6px; }
-.stack button { flex: 1; }
-
-.layer-list {
-  display: grid;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.layer-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--stroke);
-  background: var(--panel-2);
-  cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.layer-item.active {
-  border-color: var(--accent);
-  background: rgba(255, 221, 85, 0.08);
-  color: var(--accent);
-}
-
-.layer-item small { color: var(--muted); }
-
-.muted { color: var(--muted); }
-
-.canvas-wrap {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)) var(--panel);
-  border: 1px solid var(--stroke);
-  border-radius: 16px;
-  padding: 14px;
-  box-shadow: var(--shadow);
-}
-
-.canvas-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.chip {
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--stroke);
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.canvas-frame {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #0b0f15;
-}
-
-canvas {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  display: block;
-}
-
-.hint {
-  font-size: 13px;
-  color: var(--muted);
-  margin: 8px 0 0;
-}
-
-.row {
-  display: flex;
-  gap: 10px;
-}
-
-.row > div { flex: 1; }
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--stroke);
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.section {
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid var(--stroke);
-}
-
-.small-btn {
-  width: auto;
-  padding: 10px 12px;
-  margin-top: 8px;
-}
-
-.center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-@media (max-width: 960px) {
-  body { padding: 14px; }
-  .layout { grid-template-columns: 1fr; }
-  .canvas-bar { flex-direction: column; align-items: flex-start; }
-}
-</style>
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="layout">
@@ -259,7 +17,7 @@ canvas {
         <label for="reference">Verse or Keyword</label>
         <input type="text" id="reference" placeholder="John 3:16 or 'hope'" />
 
-        <div class="controls-grid" style="margin-top:10px;">
+        <div class="controls-grid controls-grid--spaced">
           <div>
             <label for="align">Align</label>
             <select id="align">
@@ -278,7 +36,7 @@ canvas {
           </div>
         </div>
 
-        <div class="stack" style="margin-top:12px;">
+        <div class="stack stack--spaced">
           <button id="generateBtn">Generate Wallpaper</button>
           <button class="secondary" id="backgroundBtn">Shuffle Background</button>
         </div>
@@ -288,7 +46,7 @@ canvas {
         </div>
         <div class="stack">
           <button class="secondary" id="addLogoBtn">Add Logo</button>
-          <input type="file" id="logoInput" accept="image/*" style="display:none;" />
+          <input type="file" id="logoInput" accept="image/*" class="hidden-input" />
           <button id="downloadBtn">Download</button>
         </div>
         <p class="hint">Tip: Drag to move layers. Grab the corner handle to resize.</p>
